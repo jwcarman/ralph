@@ -1,0 +1,14 @@
+# Loop logs — stay local
+logs/
+
+# Never commit secrets
+.env
+.env.*
+!.env.example
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# PRD contains project config — commit it (remove this line if you prefer not to)
+# PRD.md
