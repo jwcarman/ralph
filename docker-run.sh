@@ -46,6 +46,8 @@ docker run \
   \
   `# API key passed at runtime, never baked into the image` \
   -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
+  `# GitHub token — use GITHUB_TOKEN env var if set, otherwise fall back to gh CLI` \
+  -e GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}" \
   \
   `# Tuning` \
   -e MAX_ITERATIONS="${MAX_ITERATIONS:-100}" \

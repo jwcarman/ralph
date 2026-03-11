@@ -18,14 +18,16 @@ RUN apt-get update && apt-get install -y \
     bash \
     ca-certificates \
     gnupg \
+    wget \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20 (required by Claude Code)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Install Node.js LTS (required by Claude Code)
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Claude Code globally
+# Install Claude Code globally (latest)
 RUN npm install -g @anthropic-ai/claude-code
 
 # Create non-root user — principle of least privilege
@@ -38,5 +40,5 @@ RUN git config --global user.email "ralph@loop.local" \
     && git config --global user.name "Ralph Loop"
 
 # The project directory is mounted at runtime via -v
-# The entrypoint just runs the loop
-ENTRYPOINT ["/bin/bash", "loop.sh"]
+# entrypoint.sh configures git credentials then execs loop.sh
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]

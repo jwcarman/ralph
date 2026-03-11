@@ -89,13 +89,26 @@ ATTEMPTS: [what you already tried]
 
 ---
 
+## Backlog specs
+
+While working on a spec, you may discover missing pieces that are outside the current spec's scope — a dependency, a prerequisite, or a related feature that needs to exist before future work can proceed. When this happens:
+
+1. Write a new spec file to `specs/backlog/` using the standard spec format
+2. Use a descriptive filename (no number prefix needed — the human assigns numbers when promoting)
+3. Note in `progress.txt` that you added backlog items and why
+4. Do not pick up backlog specs yourself — the human reviews and moves them to `specs/` when ready
+
+A backlog spec should be small and focused. If you find yourself writing a large backlog spec, split it.
+
+---
+
 ## What you must not do
 
 - Do not make commits — bash handles all git operations
 - Do not install packages not already in the project's dependency manifest without noting it in progress.txt
 - Do not modify files in `specs/done/`
 - Do not modify `loop.sh`, `CLAUDE.md`, or `PRD.md`
-- Do not add new specs to `specs/` — the human does that
+- Do not add new specs to `specs/` directly — write discovered work to `specs/backlog/` instead (see below)
 - Do not call external APIs or services unless the spec explicitly requires it and PRD.md provides credentials/config
 - Do not delete code that isn't directly replaced by the current spec — if you think something should be removed, note it in progress.txt and let the human decide
 
