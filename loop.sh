@@ -93,26 +93,19 @@ commit_iteration() {
   fi
 }
 
-build_prompt() {
-  # Engine rules + project definition, fresh every iteration
-  cat "$SCRIPT_DIR/CLAUDE.md"
-  printf "\n\n---\n\n## Project Definition (PRD.md)\n\n"
-  cat "$SCRIPT_DIR/PRD.md"
-}
-
 run_iteration() {
   local iteration=$1
   log "--- Iteration $iteration ---"
 
   if $DRY_RUN; then
-    log "DRY RUN — prompt preview (first 30 lines):"
-    build_prompt | head -30 | while IFS= read -r line; do log "  | $line"; done
+    log "DRY RUN — would run: claude --dangerously-skip-permissions --print \"/ralph-run\""
     return 0
   fi
 
-  build_prompt | claude \
+  claude \
     --dangerously-skip-permissions \
     --print \
+    "/ralph-run" \
     2>&1 | tee -a "$LOG_FILE"
 }
 
