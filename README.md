@@ -35,11 +35,14 @@ There is no inbox, no outbox, no human approval queue. The tests pass or they do
 
 ---
 
+## Prerequisites
+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated (`claude auth login`)
+- A Claude Max subscription (recommended) — the loop runs against your subscription, not API credits
+
+---
+
 ## Quickstart
-
-### Option A — Run directly (simpler, less isolated)
-
-Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed.
 
 ```bash
 # 1. Configure your project
@@ -50,34 +53,12 @@ cp PRD.example.md PRD.md
 cp specs/000-spec-template.md.example specs/001-first-feature.md
 # Edit it
 
-# 3. Run in a tmux session
+# 3. Run in a tmux session so it keeps going after you close the terminal
 chmod +x loop.sh
 tmux new-session -s ralph
 ./loop.sh
 # Detach: Ctrl+B D    Reattach: tmux attach -t ralph
 ```
-
-### Option B — Run in Docker (recommended)
-
-Claude gets access only to the project directory. Nothing else on your machine is reachable.
-
-Requires [Docker](https://docs.docker.com/get-docker/) installed.
-
-```bash
-# 1. Configure your project (same as above)
-cp PRD.example.md PRD.md
-
-# 2. Set your API key
-export ANTHROPIC_API_KEY=sk-ant-...
-
-# 3. Run
-chmod +x docker-run.sh
-./docker-run.sh
-```
-
-The container mounts your project directory read-write, so all changes (code and git commits) appear on your local filesystem in real time.
-
-By default the container runs with `--network none`. If your project needs to fetch dependencies during the loop, remove that line from `docker-run.sh`.
 
 ---
 
@@ -95,13 +76,17 @@ cp specs/000-spec-template.md.example specs/005-add-pagination.md
 
 The agent will not mark a spec done until its acceptance criteria pass. Write acceptance criteria that are machine-checkable — "pnpm test passes" not "the feature works."
 
+### Backlog
+
+If the agent discovers work that's out of scope for the current spec, it writes new specs to `specs/backlog/`. These are not picked up automatically — review them and move the ones you want to `specs/` with a numeric prefix.
+
 ---
 
 ## Monitoring
 
 ```bash
 # What's happening right now
-tail -f logs/loop-*.log | tail -1
+tail -f logs/loop-*.log
 
 # What happened in the last iteration
 cat progress.txt
@@ -166,7 +151,7 @@ That's a tuning signal. Don't blame the tool — add a rule to `PRD.md` so it ne
 
 Common additions:
 - A specific pattern it keeps getting wrong → add to **Coding conventions**
-- A file it shouldn't be touching → add to **Constraints and guardrails**  
+- A file it shouldn't be touching → add to **Constraints and guardrails**
 - A test command it's running incorrectly → fix **How to run tests**
 
 ---
@@ -184,16 +169,12 @@ To resume after resolving the blocker:
 
 ## Security
 
-`loop.sh` uses `--dangerously-skip-permissions`. This is required for autonomous operation — permission prompts would break the loop. It means Claude can read and write anything inside the working directory.
+`loop.sh` uses `--dangerously-skip-permissions`. This is required for autonomous operation — permission prompts would break the loop. It means Claude can read and write anything your user account can access.
 
-**This is why Docker is recommended.** The container hard-limits what Claude can touch to your project directory via the volume mount. Your SSH keys, credentials, other projects, and the rest of your filesystem are not reachable from inside the container.
-
-Note: outbound network access is required. Claude Code must reach `api.anthropic.com` to function. The container does not expose any inbound ports.
-
-Regardless of Docker or not:
 - Never put production credentials in the project directory while the loop is running
 - Never run this on a machine where the blast radius of a runaway agent matters
 - Use environment variables for secrets, and confirm your `.env` file is in `.gitignore`
+- Run in a dedicated tmux session so you can monitor and interrupt if needed
 
 ---
 
@@ -205,21 +186,19 @@ Regardless of Docker or not:
 ├── CLAUDE.md                        ← agent engine rules (rarely edit)
 ├── PRD.md                           ← YOUR project config (fill this out)
 ├── PRD.example.md                   ← template to copy from
-├── Dockerfile                       ← sandbox image
-├── docker-run.sh                    ← convenience wrapper for Docker
 ├── progress.txt                     ← state handoff between iterations
 ├── .gitignore
 ├── specs/
 │   ├── 000-spec-template.md.example ← copy this to write new specs
 │   ├── 001-your-first-spec.md       ← add your specs here
+│   ├── backlog/                     ← agent-discovered work (review before promoting)
 │   └── done/                        ← completed specs land here
-├── logs/                            ← timestamped loop logs (gitignored)
-└── [your project code]              ← the codebase being evolved
+└── logs/                            ← timestamped loop logs (gitignored)
 ```
 
 ---
 
 ## Credits
 
-Ralph pattern by [Geoffrey Huntley](https://ghuntley.com/ralph/).  
+Ralph pattern by [Geoffrey Huntley](https://ghuntley.com/ralph/).
 "Everything is a ralph loop" — [ghuntley.com/loop](https://ghuntley.com/loop/).
