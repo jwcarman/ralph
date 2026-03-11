@@ -10,7 +10,7 @@ Bash controls the loop. Claude writes and verifies the code. Tests are the judge
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                    loop.sh                       │
+│                  ralph-ralph-loop.sh                    │
 │                                                  │
 │   while specs/ is not empty:                     │
 │     spawn claude (fresh context)                 │
@@ -54,9 +54,9 @@ cp specs/000-spec-template.md.example specs/001-first-feature.md
 # Edit it
 
 # 3. Run in a tmux session so it keeps going after you close the terminal
-chmod +x loop.sh
+chmod +x ralph-loop.sh
 tmux new-session -s ralph
-./loop.sh
+./ralph-loop.sh
 # Detach: Ctrl+B D    Reattach: tmux attach -t ralph
 ```
 
@@ -119,10 +119,10 @@ git reset --hard HEAD~1
 git reset --hard HEAD~N
 
 # Run one iteration and stop (useful for testing your PRD)
-./loop.sh --once
+./ralph-loop.sh --once
 
 # Preview the prompt without running
-./loop.sh --dry-run
+./ralph-loop.sh --dry-run
 ```
 
 ---
@@ -133,16 +133,16 @@ git reset --hard HEAD~N
 
 ```bash
 # Fast (good for greenfield, low stakes)
-PAUSE_SECONDS=5 ./loop.sh
+PAUSE_SECONDS=5 ./ralph-loop.sh
 
 # Slow (good for reviewing between iterations)
-PAUSE_SECONDS=120 ./loop.sh
+PAUSE_SECONDS=120 ./ralph-loop.sh
 ```
 
 ### Cap total iterations
 
 ```bash
-MAX_ITERATIONS=20 ./loop.sh
+MAX_ITERATIONS=20 ./ralph-loop.sh
 ```
 
 ### When the loop does something wrong
@@ -169,7 +169,7 @@ To resume after resolving the blocker:
 
 ## Security
 
-`loop.sh` uses `--dangerously-skip-permissions`. This is required for autonomous operation — permission prompts would break the loop. It means Claude can read and write anything your user account can access.
+`ralph-loop.sh` uses `--dangerously-skip-permissions`. This is required for autonomous operation — permission prompts would break the loop. It means Claude can read and write anything your user account can access.
 
 - Never put production credentials in the project directory while the loop is running
 - Never run this on a machine where the blast radius of a runaway agent matters
@@ -182,7 +182,7 @@ To resume after resolving the blocker:
 
 ```
 /
-├── loop.sh                          ← bash controller (never edit)
+├── ralph-loop.sh                          ← bash controller (never edit)
 ├── CLAUDE.md                        ← agent engine rules (rarely edit)
 ├── PRD.md                           ← YOUR project config (fill this out)
 ├── PRD.example.md                   ← template to copy from
